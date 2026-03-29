@@ -2,6 +2,9 @@ package local.pk154938.shop.ui.menu;
 
 import local.pk154938.shop.application.service.UserService;
 import local.pk154938.shop.application.session.Session;
+import local.pk154938.shop.domain.user.User;
+
+import java.util.Optional;
 
 public class MainMenu {
     private final UserService userService;
@@ -43,14 +46,12 @@ public class MainMenu {
         System.out.print("Hasło: ");
         String password = System.console().readLine();
 
-        var user = userService.login(login, password);
-        if (user == null) {
-            System.out.println("Błędne dane logowania");
+        Optional<User> user = userService.login(login);
+        if (user.isPresent()) {
+            session.login(user.get());
+            System.out.println("Zalogowano jako: " + user.get().getUsername());
         } else {
-            session.login(user);
-            System.out.println("Zalogowano jako: " + user.getUsername());
+            System.out.println("Błędne dane logowania");
         }
     }
-
-    ;
 }
