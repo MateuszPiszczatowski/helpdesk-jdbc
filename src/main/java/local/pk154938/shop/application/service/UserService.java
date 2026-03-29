@@ -1,14 +1,23 @@
 package local.pk154938.shop.application.service;
 
-import local.pk154938.shop.domain.user.Role;
+import local.pk154938.shop.application.repository.UserRepository;
 import local.pk154938.shop.domain.user.User;
 
-import java.util.Set;
+import java.util.List;
+import java.util.Optional;
 
 public class UserService {
-    public User login(String username, String password){
-        if(username == null || username.isBlank()) return null;
-        if(password == null || password.isBlank()) return null;
-        return new User(username, password, Set.of(Role.ADMIN));
+    private final UserRepository userRepository;
+    public UserService(UserRepository userRepository){
+        this.userRepository = userRepository;
+    }
+    public Optional<User> login(String username){
+        return userRepository.findByUsername(username);
+    }
+    public void removeUser(String username) {
+        userRepository.delete(username);
+    }
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }
