@@ -5,7 +5,7 @@ import java.util.Set;
 public abstract class User {
     private final String username;
     private final String hashedPassword;
-    private Set<Role> roles;
+    private final Set<Role> roles;
 
     public User(String username, String hashedPassword, Set<Role> roles){
         this.username = username;
