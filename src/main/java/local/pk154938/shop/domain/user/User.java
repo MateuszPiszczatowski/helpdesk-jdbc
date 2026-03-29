@@ -2,7 +2,7 @@ package local.pk154938.shop.domain.user;
 
 import java.util.Set;
 
-public class User {
+public abstract class User {
     private final String username;
     private final String hashedPassword;
     private Set<Role> roles;
