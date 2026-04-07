@@ -15,19 +15,18 @@ public class DataSeeder {
     }
 
     public void seedAdminIfMissing() {
-        // Check if any admin already exists
         boolean adminExists = userRepository.findAll().stream()
                 .anyMatch(user -> user.getRoles().contains(Role.ADMIN));
 
         if (!adminExists) {
             String adminUser = System.getenv("SHOP_DEFAULT_ADMIN_USER");
             if (adminUser == null || adminUser.isBlank()) {
-                adminUser = "admin"; // Fallback default
+                adminUser = "admin";
             }
 
             String adminPass = System.getenv("SHOP_DEFAULT_ADMIN_PASS");
             if (adminPass == null || adminPass.isBlank()) {
-                adminPass = "admin"; // Fallback default
+                adminPass = "admin";
             }
 
             String salt = SecurityUtils.generateSalt();

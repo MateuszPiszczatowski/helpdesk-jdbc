@@ -34,7 +34,7 @@ public class UserManagementMenu extends BaseMenu {
         System.out.print("Podaj login: ");
         String login = System.console().readLine();
         System.out.print("Podaj hasło: ");
-        String pass = Arrays.toString(System.console().readPassword());
+        String pass = new String(System.console().readPassword());
 
         Role role = chooseRole();
         if (role == null) return;
