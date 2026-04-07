@@ -7,12 +7,22 @@ import local.pk154938.shop.infrastructure.persistence.InMemoryUserRepository;
 import local.pk154938.shop.ui.menu.MainMenu;
 
 public class Main {
+    public static void terminate(ExitCode exitCode) {
+        System.err.println("ZAMYKANIE: " + exitCode.getMessage());
+        System.exit(exitCode.getCode());
+    }
+
     public static void main(String[] args) {
         Session session = new Session();
         UserRepository userRepository = new InMemoryUserRepository();
 
         DataSeeder dataSeeder = new DataSeeder(userRepository);
-        dataSeeder.seedAdminIfMissing();
+        try{
+            dataSeeder.seedAdminIfMissing();
+        } catch (IllegalStateException e){
+            System.out.println(e.getMessage());
+            terminate(ExitCode.INVALID_CONFIG);
+        }
 
         AuthorizationService authService = new AuthorizationService();
         UserService userService = new UserService(userRepository, authService);

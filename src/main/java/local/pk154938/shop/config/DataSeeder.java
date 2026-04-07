@@ -26,8 +26,13 @@ public class DataSeeder {
 
             String adminPass = System.getenv("SHOP_DEFAULT_ADMIN_PASS");
             if (adminPass == null || adminPass.isBlank()) {
-                adminPass = "admin";
+                adminPass = "Admin1234!";
             }
+
+            if(!SecurityUtils.isPasswordStrong(adminPass))
+                throw new IllegalStateException("CRITICAL: Hasło administratora ze zmiennych środowiskowych nie "+
+                        "spełnia wymogów bezpieczeństwa!\nWymagania: min. 8 znaków długości, 1 wielka litera, 1 mała"+
+                        " litera, 1 cyfra i 1 znak specjalny.");
 
             String salt = SecurityUtils.generateSalt();
             String hashedPassword = SecurityUtils.hashPassword(adminPass, salt);
