@@ -5,12 +5,14 @@ import java.util.Set;
 public abstract class User {
     private final String username;
     private final String hashedPassword;
+    private final String salt;
     private final Set<Role> roles;
 
-    public User(String username, String hashedPassword, Set<Role> roles){
+    public User(String username, String hashedPassword, String salt, Set<Role> roles){
         this.username = username;
         this.hashedPassword = hashedPassword;
         this.roles = roles;
+        this.salt = salt;
     }
 
     public String getUsername() {
@@ -20,6 +22,8 @@ public abstract class User {
     public String getHashedPassword() {
         return hashedPassword;
     }
+
+    public String getSalt() {return salt;}
 
     public Set<Role> getRoles() {return roles;}
 }

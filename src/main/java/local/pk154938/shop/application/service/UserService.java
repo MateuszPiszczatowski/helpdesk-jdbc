@@ -4,6 +4,7 @@ import local.pk154938.shop.application.auth.AuthorizationService;
 import local.pk154938.shop.application.auth.Operation;
 import local.pk154938.shop.application.repository.UserRepository;
 import local.pk154938.shop.domain.user.*;
+import local.pk154938.shop.util.SecurityUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ public class UserService {
     public Optional<User> login(String username){
         return userRepository.findByUsername(username);
     }
+
     public void removeUser(String username) {
         userRepository.delete(username);
     }
@@ -30,10 +32,13 @@ public class UserService {
         }
 
         User newUser;
+        String salt = SecurityUtils.generateSalt();
+        String hashedPassword = SecurityUtils.hashPassword(password, salt);
+
         switch (roleToCreate) {
-            case ADMIN:    newUser = new Admin(username, password, Set.of(Role.ADMIN)); break;
-            case MANAGER:  newUser = new Manager(username, password, Set.of(Role.MANAGER)); break;
-            case EMPLOYEE: newUser = new Employee(username, password, Set.of(Role.EMPLOYEE)); break;
+            case ADMIN:    newUser = new Admin(username, hashedPassword, salt, Set.of(Role.ADMIN)); break;
+            case MANAGER:  newUser = new Manager(username, hashedPassword, salt, Set.of(Role.MANAGER)); break;
+            case EMPLOYEE: newUser = new Employee(username, hashedPassword, salt, Set.of(Role.EMPLOYEE)); break;
             default: throw new IllegalArgumentException("Nieznana rola!");
         }
 
@@ -43,6 +48,7 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
     private Operation mapRoleToOperation(Role role) {
         switch (role) {
             case ADMIN: return Operation.ADD_ADMIN;

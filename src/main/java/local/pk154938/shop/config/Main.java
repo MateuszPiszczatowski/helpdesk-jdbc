@@ -17,7 +17,7 @@ public class Main {
         UserRepository userRepository = new InMemoryUserRepository();
         AuthorizationService authService = new AuthorizationService();
         UserService userService = new UserService(userRepository, authService);
-        User user = new Admin("Admin", "Admin", Set.of(Role.ADMIN));
+        User user = new Admin("Admin", "Admin", "", Set.of(Role.ADMIN));
         userRepository.save(user);
         MainMenu menu = new MainMenu(userService, session, authService);
         menu.show();
