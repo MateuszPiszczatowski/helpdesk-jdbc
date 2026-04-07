@@ -38,7 +38,6 @@ public abstract class BaseMenu {
             prepareOptions();
             addOptions();
             if(options.isEmpty()){
-                running=false;
                 break;
             }
             display();
