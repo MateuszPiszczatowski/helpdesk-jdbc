@@ -1,64 +1,19 @@
 package local.pk154938.shop.ui.menu;
 
+import local.pk154938.shop.application.auth.AuthorizationService;
+import local.pk154938.shop.application.auth.Operation;
 import local.pk154938.shop.application.service.UserService;
 import local.pk154938.shop.application.session.Session;
 import local.pk154938.shop.domain.user.User;
 
 import java.util.Optional;
 
-public class MainMenu {
+public class MainMenu extends BaseMenu {
     private final UserService userService;
-    private final Session session;
 
-    public MainMenu(UserService userService, Session session) {
+    public MainMenu(UserService userService, Session session, AuthorizationService authorizationService) {
+        super("Menu główne", session, authorizationService);
         this.userService = userService;
-        this.session = session;
-    }
-
-    public void show() {
-        boolean running = true;
-
-        while (running) {
-            if (session.isLoggedIn()) {
-                System.out.println("1. Wyloguj");
-                System.out.println("2. Zarządzanie użytkownikami");
-                System.out.println("0. Wyjście");
-                System.out.print("Wybierz opcję: ");
-
-                String choice = System.console().readLine();
-                switch (choice) {
-                    case "1":
-                        session.logout();
-                        System.out.println("Wylogowano.");
-                        break;
-                    case "2":
-                        new UserManagementMenu(userService, session).show();
-                        break;
-                    case "0":
-                        running = false;
-                        break;
-                }
-            } else {
-                System.out.println("=== MENU GŁÓWNE ===");
-                System.out.println("1. Zaloguj");
-                System.out.println("0. Wyjście");
-                System.out.print("Wybierz opcję: ");
-
-                String choice = System.console().readLine();
-
-                switch (choice) {
-                    case "1":
-                        handleLogin();
-                        break;
-                    case "0":
-                        running = false;
-                        break;
-                    default:
-                        System.out.println("Niepoprawny wybór.");
-                }
-            }
-        }
-        System.out.println("Zamykanie programu...");
     }
 
     private void handleLogin() {
@@ -73,6 +28,26 @@ public class MainMenu {
             System.out.println("Zalogowano jako: " + user.get().getUsername());
         } else {
             System.out.println("Błędne dane logowania");
+        }
+    }
+
+    private void logout(){
+        session.logout();
+        System.out.println("Wylogowano.");
+    }
+
+    private void enterUserManagement() {
+        new UserManagementMenu(userService, session, authorizationService).show();
+    }
+
+
+    @Override
+    protected void addOptions() {
+        if (session.isLoggedIn()) {
+            addOption("Zarządzanie użytkownikami", this::enterUserManagement, Operation.ENTER_USER_MANAGEMENT);
+            addOption("Wyloguj", this::logout, Operation.UNRESTRICTED);
+        } else {
+            addOption("Zaloguj", this::handleLogin, Operation.UNRESTRICTED);
         }
     }
 }

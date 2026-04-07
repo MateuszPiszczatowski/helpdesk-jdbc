@@ -1,6 +1,7 @@
 package local.pk154938.shop.application.auth;
 
 public enum Operation {
+    UNRESTRICTED,
     ADD_ADMIN,
     MODIFY_ADMIN,
     REMOVE_ADMIN,
@@ -15,5 +16,6 @@ public enum Operation {
     REGISTER_DELIVERY,
     MAKE_RETURN,
     PLACE_SUPPLIER_ORDER,
-    VIEW_STOCK
+    VIEW_STOCK,
+    ENTER_USER_MANAGEMENT
 }

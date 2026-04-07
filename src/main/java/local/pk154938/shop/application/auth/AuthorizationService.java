@@ -21,7 +21,8 @@ public class AuthorizationService {
             Map.entry(Operation.MAKE_SALE, Permission.PROCESS_TRADE),
             Map.entry(Operation.MAKE_RETURN, Permission.PROCESS_TRADE),
             Map.entry(Operation.PLACE_SUPPLIER_ORDER, Permission.PROCESS_TRADE),
-            Map.entry(Operation.REGISTER_DELIVERY, Permission.PROCESS_TRADE)
+            Map.entry(Operation.REGISTER_DELIVERY, Permission.PROCESS_TRADE),
+            Map.entry(Operation.ENTER_USER_MANAGEMENT, Permission.VIEW_USERS)
     );
     public boolean isAuthorized(User user, Operation op){
         Permission required = securityMap.get(op);

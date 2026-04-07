@@ -19,7 +19,7 @@ public class Main {
         UserService userService = new UserService(userRepository, authService);
         User user = new Admin("Admin", "Admin", Set.of(Role.ADMIN));
         userRepository.save(user);
-        MainMenu menu = new MainMenu(userService, session);
+        MainMenu menu = new MainMenu(userService, session, authService);
         menu.show();
     }
 }
