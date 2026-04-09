@@ -19,7 +19,7 @@ public abstract class User {
         this.salt = salt;
     }
     protected User(UUID id,String username, String hashedPassword, String salt, Set<Role> roles){
-        this.id = UUID.randomUUID();
+        this.id = id;
         this.username = username;
         this.hashedPassword = hashedPassword;
         this.roles = roles;
