@@ -49,7 +49,11 @@ public abstract class BaseMenu {
     }
 
     private void display(){
-        System.out.println("\n=== " + title + " ===");
+        System.out.println();
+        if (session.isLoggedIn()) {
+            System.out.println("Zalogowano jako: " + session.getCurrentUser().getUsername());
+        }
+        System.out.println("=== " + title + " ===");
 
         for (int i = 0; i < options.size(); i++) {
             System.out.println((i + 1) + ". " + options.get(i).getLabel());
