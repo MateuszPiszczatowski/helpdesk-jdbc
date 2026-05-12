@@ -41,14 +41,19 @@ public class MainMenu extends BaseMenu {
         new UserManagementMenu(userService, session, authorizationService).show();
     }
 
+    private void enterAccountManagement() {
+        new AccountManagementMenu(userService, session, authorizationService).show();
+    }
+
 
     @Override
     protected void addOptions() {
         if (session.isLoggedIn()) {
-            addOption("Zarządzanie użytkownikami", this::enterUserManagement, 
-                    Operation.VIEW_USER_LIST, Operation.ADD_EMPLOYEE, Operation.REMOVE_EMPLOYEE, 
-                    Operation.ADD_MANAGER, Operation.REMOVE_MANAGER, 
+            addOption("Zarządzanie użytkownikami", this::enterUserManagement,
+                    Operation.VIEW_USER_LIST, Operation.ADD_EMPLOYEE, Operation.REMOVE_EMPLOYEE,
+                    Operation.ADD_MANAGER, Operation.REMOVE_MANAGER,
                     Operation.ADD_ADMIN, Operation.REMOVE_ADMIN);
+            addOption("Zarządzanie kontem", this::enterAccountManagement, Operation.AUTHENTICATED);
             addOption("Wyloguj", this::logout, Operation.AUTHENTICATED);
         } else {
             addOption("Zaloguj", this::handleLogin, Operation.ANONYMOUS);
