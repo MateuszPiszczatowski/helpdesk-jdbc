@@ -99,4 +99,51 @@ public class UserService {
             default: throw new IllegalStateException("Nieobsługiwana rola");
         }
     }
+
+    private void validateModificationPermissions(User targetUser, User currentUser) {
+        for (Role role : targetUser.getRoles()) {
+            Operation requiredOp = getRoleModifyOperation(role);
+            if (!authService.isAuthorized(currentUser, requiredOp)) {
+                throw new SecurityException("Brak uprawnień do modyfikacji użytkownika o roli: " + role);
+            }
+        }
+    }
+
+    public User changePassword(String targetUsername, String newRawPassword, User currentUser) {
+        User targetUser = userRepository.findByUsername(targetUsername)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym loginie."));
+
+        if (!targetUser.getId().equals(currentUser.getId())) {
+            validateModificationPermissions(targetUser, currentUser);
+        }
+
+        String newHashedPassword = SecurityUtils.hashPassword(newRawPassword, targetUser.getSalt());
+        User updatedUser = targetUser.withPassword(newHashedPassword);
+        userRepository.save(updatedUser);
+        return updatedUser;
+    }
+
+    public User changeUsername(String oldUsername, String newUsername, User currentUser) {
+        if(oldUsername.equals(newUsername))
+            return currentUser;
+        User targetUser = userRepository.findByUsername(oldUsername)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym loginie."));
+        if(userRepository.findByUsername(newUsername).isPresent())
+            throw new IllegalStateException("Użytkownik o podanym loginie już istnieje.");
+
+        validateModificationPermissions(targetUser, currentUser);
+
+        User updatedUser = targetUser.withUsername(newUsername);
+        userRepository.save(updatedUser);
+        return updatedUser;
+    }
+
+    private Operation getRoleModifyOperation(Role role) {
+        switch (role) {
+            case ADMIN: return Operation.MODIFY_ADMIN;
+            case MANAGER: return Operation.MODIFY_MANAGER;
+            case EMPLOYEE: return Operation.MODIFY_EMPLOYEE;
+            default: throw new IllegalStateException("Nieobsługiwana rola");
+        }
+    }
 }
