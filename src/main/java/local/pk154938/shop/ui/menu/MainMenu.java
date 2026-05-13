@@ -57,7 +57,7 @@ public class MainMenu extends BaseMenu {
                     Operation.ADD_MANAGER, Operation.REMOVE_MANAGER,
                     Operation.ADD_ADMIN, Operation.REMOVE_ADMIN);
             addOption("Operacje handlowe", this::enterTradeMenu,
-                    Operation.VIEW_STOCK, Operation.MAKE_SALE, Operation.MAKE_RETURN,
+                    Operation.VIEW_TRADE_INFO, Operation.MAKE_SALE, Operation.MAKE_RETURN,
                     Operation.REGISTER_DELIVERY, Operation.PLACE_SUPPLIER_ORDER);
             addOption("Zarządzanie kontem", this::enterAccountManagement, Operation.AUTHENTICATED);
             addOption("Wyloguj", this::logout, Operation.AUTHENTICATED);

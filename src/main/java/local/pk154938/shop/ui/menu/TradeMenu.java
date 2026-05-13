@@ -12,7 +12,7 @@ public class TradeMenu extends BaseMenu {
 
     @Override
     protected void addOptions() {
-        addOption("Wyświetl stan magazynu", this::viewStock, Operation.VIEW_STOCK);
+        addOption("Wyświetl stan magazynu", this::viewStock, Operation.VIEW_TRADE_INFO);
         addOption("Dokonaj sprzedaży", this::makeSale, Operation.MAKE_SALE);
         addOption("Dokonaj zwrotu", this::makeReturn, Operation.MAKE_RETURN);
         addOption("Zarejestruj dostawę", this::registerDelivery, Operation.REGISTER_DELIVERY);

@@ -17,5 +17,5 @@ public enum Operation {
     REGISTER_DELIVERY,
     MAKE_RETURN,
     PLACE_SUPPLIER_ORDER,
-    VIEW_STOCK
+    VIEW_TRADE_INFO
 }

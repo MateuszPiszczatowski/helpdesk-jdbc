@@ -18,7 +18,7 @@ public class AuthorizationService {
             Map.entry(Operation.MODIFY_ADMIN, Set.of(Permission.MANAGE_ADMINISTRATORS)),
             Map.entry(Operation.REMOVE_ADMIN, Set.of(Permission.MANAGE_ADMINISTRATORS)),
             Map.entry(Operation.VIEW_USER_LIST, Set.of(Permission.VIEW_USERS)),
-            Map.entry(Operation.VIEW_STOCK, Set.of(Permission.PROCESS_TRADE)),
+            Map.entry(Operation.VIEW_TRADE_INFO, Set.of(Permission.PROCESS_TRADE)),
             Map.entry(Operation.MAKE_SALE, Set.of(Permission.PROCESS_TRADE)),
             Map.entry(Operation.MAKE_RETURN, Set.of(Permission.PROCESS_TRADE)),
             Map.entry(Operation.PLACE_SUPPLIER_ORDER, Set.of(Permission.PROCESS_TRADE)),
