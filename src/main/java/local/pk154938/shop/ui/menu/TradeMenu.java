@@ -2,12 +2,29 @@ package local.pk154938.shop.ui.menu;
 
 import local.pk154938.shop.application.auth.AuthorizationService;
 import local.pk154938.shop.application.auth.Operation;
+import local.pk154938.shop.application.repository.ProductRepository;
+import local.pk154938.shop.application.repository.StockRepository;
+import local.pk154938.shop.application.repository.TradeRepository;
+import local.pk154938.shop.application.service.TradeService;
 import local.pk154938.shop.application.session.Session;
 
 public class TradeMenu extends BaseMenu {
+    protected final TradeService tradeService;
+    protected final ProductRepository productRepository;
+    protected final StockRepository stockRepository;
+    protected final TradeRepository tradeRepository;
 
-    public TradeMenu(Session session, AuthorizationService authorizationService) {
+    public TradeMenu(TradeService tradeService,
+                     ProductRepository productRepository,
+                     StockRepository stockRepository,
+                     TradeRepository tradeRepository,
+                     Session session,
+                     AuthorizationService authorizationService) {
         super("OPERACJE HANDLOWE", session, authorizationService);
+        this.tradeService = tradeService;
+        this.productRepository = productRepository;
+        this.stockRepository = stockRepository;
+        this.tradeRepository = tradeRepository;
     }
 
     @Override

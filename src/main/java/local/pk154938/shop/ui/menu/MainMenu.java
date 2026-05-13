@@ -2,19 +2,36 @@ package local.pk154938.shop.ui.menu;
 
 import local.pk154938.shop.application.auth.AuthorizationService;
 import local.pk154938.shop.application.auth.Operation;
+import local.pk154938.shop.application.repository.ProductRepository;
+import local.pk154938.shop.application.repository.StockRepository;
+import local.pk154938.shop.application.repository.TradeRepository;
+import local.pk154938.shop.application.service.TradeService;
 import local.pk154938.shop.application.service.UserService;
 import local.pk154938.shop.application.session.Session;
 import local.pk154938.shop.domain.user.User;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 public class MainMenu extends BaseMenu {
     private final UserService userService;
+    private final TradeService tradeService;
+    private final ProductRepository productRepository;
+    private final StockRepository stockRepository;
+    private final TradeRepository tradeRepository;
 
-    public MainMenu(UserService userService, Session session, AuthorizationService authorizationService) {
+    public MainMenu(UserService userService,
+                    TradeService tradeService,
+                    ProductRepository productRepository,
+                    StockRepository stockRepository,
+                    TradeRepository tradeRepository,
+                    Session session,
+                    AuthorizationService authorizationService) {
         super("Menu główne", session, authorizationService);
         this.userService = userService;
+        this.tradeService = tradeService;
+        this.productRepository = productRepository;
+        this.stockRepository = stockRepository;
+        this.tradeRepository = tradeRepository;
     }
 
     private void handleLogin() {
@@ -45,7 +62,8 @@ public class MainMenu extends BaseMenu {
     }
 
     private void enterTradeMenu() {
-        new TradeMenu(session, authorizationService).show();
+        new TradeMenu(tradeService, productRepository, stockRepository, tradeRepository,
+                session, authorizationService).show();
     }
 
 
