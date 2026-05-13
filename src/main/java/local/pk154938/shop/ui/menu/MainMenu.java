@@ -26,7 +26,6 @@ public class MainMenu extends BaseMenu {
         Optional<User> user = userService.login(login, password);
         if (user.isPresent()) {
             session.login(user.get());
-            System.out.println("Zalogowano jako: " + user.get().getUsername());
         } else {
             System.out.println("Błędne dane logowania");
         }
