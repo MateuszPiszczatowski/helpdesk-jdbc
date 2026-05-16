@@ -1,13 +1,9 @@
 package local.pk154938.shop.ui.menu;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
 /**
- * Console input helpers used by trade menus. An empty input is treated as
- * a user-initiated cancellation — readers that require a value throw
- * {@link CancelledException} so the surrounding flow can short-circuit
- * with a single try/catch.
+ * Console input helpers. An empty input is treated as a user-initiated
+ * cancellation — readers that require a value throw {@link CancelledException}
+ * so the surrounding flow can short-circuit with a single try/catch.
  */
 public final class InputReader {
 
@@ -23,19 +19,6 @@ public final class InputReader {
         return s.trim();
     }
 
-    public static BigDecimal readNonNegativeBigDecimal(String prompt) {
-        String s = readNonBlankString(prompt).replace(',', '.');
-        BigDecimal value;
-        try {
-            value = new BigDecimal(s);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Niepoprawna liczba: " + s);
-        }
-        if (value.signum() < 0)
-            throw new IllegalArgumentException("Wartość nie może być ujemna.");
-        return value;
-    }
-
     public static int readPositiveInt(String prompt) {
         String s = readNonBlankString(prompt);
         int v;
@@ -49,12 +32,21 @@ public final class InputReader {
         return v;
     }
 
-    public static UUID readUuid(String prompt) {
-        String s = readNonBlankString(prompt);
+    /**
+     * Like {@link #readPositiveInt}, but an empty input returns {@code null}
+     * instead of cancelling — useful when the field is optional.
+     */
+    public static Integer readOptionalPositiveInt(String prompt) {
+        String s = System.console().readLine(prompt);
+        if (s == null || s.isBlank()) return null;
+        int v;
         try {
-            return UUID.fromString(s);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Niepoprawny format UUID: " + s);
+            v = Integer.parseInt(s.trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Niepoprawna liczba całkowita: " + s);
         }
+        if (v <= 0)
+            throw new IllegalArgumentException("Wartość musi być dodatnia.");
+        return v;
     }
 }
