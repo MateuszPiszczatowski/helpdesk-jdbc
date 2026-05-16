@@ -4,8 +4,11 @@ import local.pk154938.shop.application.auth.AuthorizationService;
 import local.pk154938.shop.application.repository.UserRepository;
 import local.pk154938.shop.application.service.UserService;
 import local.pk154938.shop.application.session.Session;
+import local.pk154938.shop.infrastructure.persistence.DbConnection;
 import local.pk154938.shop.infrastructure.persistence.InMemoryUserRepository;
 import local.pk154938.shop.ui.menu.MainMenu;
+
+import java.sql.SQLException;
 
 public class Main {
     /**
@@ -34,10 +37,24 @@ public class Main {
             return;
         }
 
-        AuthorizationService authService = new AuthorizationService();
-        UserService userService = new UserService(userRepository, authService);
+        DbConnection db = null;
+        try {
+            db = new DbConnection();
+            db.initSchema();
+        } catch (SQLException e) {
+            System.out.println("Nie udało się połączyć z bazą danych: " + e.getMessage());
+            terminate(ExitCode.DATABASE_ERROR);
+            return;
+        }
 
-        MainMenu menu = new MainMenu(userService, session, authService);
-        menu.show();
+        try {
+            AuthorizationService authService = new AuthorizationService();
+            UserService userService = new UserService(userRepository, authService);
+
+            MainMenu menu = new MainMenu(userService, session, authService);
+            menu.show();
+        } finally {
+            db.close();
+        }
     }
 }
