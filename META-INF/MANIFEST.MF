@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
 Main-Class: local.pk154938.shop.config.Main
+Class-Path: lib/mysql-connector-j-9.3.0.jar
 
