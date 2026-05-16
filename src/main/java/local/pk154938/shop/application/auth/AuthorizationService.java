@@ -8,15 +8,9 @@ import java.util.Set;
 
 public class AuthorizationService {
     private final Map<Operation, Set<Permission>> securityMap = Map.ofEntries(
-            Map.entry(Operation.ADD_EMPLOYEE, Set.of(Permission.MANAGE_EMPLOYEES)),
-            Map.entry(Operation.MODIFY_EMPLOYEE, Set.of(Permission.MANAGE_EMPLOYEES)),
-            Map.entry(Operation.REMOVE_EMPLOYEE, Set.of(Permission.MANAGE_EMPLOYEES)),
-            Map.entry(Operation.ADD_MANAGER, Set.of(Permission.MANAGE_MANAGERS)),
-            Map.entry(Operation.MODIFY_MANAGER, Set.of(Permission.MANAGE_MANAGERS)),
-            Map.entry(Operation.REMOVE_MANAGER, Set.of(Permission.MANAGE_MANAGERS)),
-            Map.entry(Operation.ADD_ADMIN, Set.of(Permission.MANAGE_ADMINISTRATORS)),
-            Map.entry(Operation.MODIFY_ADMIN, Set.of(Permission.MANAGE_ADMINISTRATORS)),
-            Map.entry(Operation.REMOVE_ADMIN, Set.of(Permission.MANAGE_ADMINISTRATORS)),
+            Map.entry(Operation.ADD_USER, Set.of(Permission.MANAGE_OPERATORS)),
+            Map.entry(Operation.MODIFY_USER, Set.of(Permission.MANAGE_OPERATORS)),
+            Map.entry(Operation.REMOVE_USER, Set.of(Permission.MANAGE_OPERATORS)),
             Map.entry(Operation.VIEW_USER_LIST, Set.of(Permission.VIEW_USERS))
     );
 

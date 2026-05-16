@@ -3,7 +3,9 @@ package local.pk154938.shop.application.service;
 import local.pk154938.shop.application.auth.AuthorizationService;
 import local.pk154938.shop.application.auth.Operation;
 import local.pk154938.shop.application.repository.UserRepository;
-import local.pk154938.shop.domain.user.*;
+import local.pk154938.shop.domain.user.Operator;
+import local.pk154938.shop.domain.user.Role;
+import local.pk154938.shop.domain.user.User;
 import local.pk154938.shop.util.SecurityUtils;
 
 import java.util.List;
@@ -13,108 +15,52 @@ import java.util.Set;
 public class UserService {
     private final UserRepository userRepository;
     private final AuthorizationService authService;
-    public UserService(UserRepository userRepository, AuthorizationService authService){
+
+    public UserService(UserRepository userRepository, AuthorizationService authService) {
         this.userRepository = userRepository;
         this.authService = authService;
     }
-    public Optional<User> login(String username, String rawPassword){
+
+    public Optional<User> login(String username, String rawPassword) {
         return userRepository.findByUsername(username).filter(user -> {
             String attemptHash = SecurityUtils.hashPassword(rawPassword, user.getSalt());
             return attemptHash.equals(user.getHashedPassword());
         });
     }
 
-    private void validateRemovalPermissions(User targetUser, User currentUser) {
-        for (Role role : targetUser.getRoles()) {
-            Operation requiredOp = mapRoleToRemoveOperation(role);
-            if (!authService.isAuthorized(currentUser, requiredOp)) {
-                throw new SecurityException("Brak uprawnień do usunięcia roli: " + role);
-            }
-        }
-    }
+    public void createAndAddUser(String username, String password, User currentUser) {
+        if (!authService.isAuthorized(currentUser, Operation.ADD_USER))
+            throw new SecurityException("Brak uprawnień do tworzenia operatora.");
+        if (userRepository.findByUsername(username).isPresent())
+            throw new IllegalStateException("Użytkownik o podanym loginie już istnieje.");
 
-    private void preventLastAdminRemoval(User targetUser) {
-        if (targetUser.getRoles().contains(Role.ADMIN) && isLastAdmin()) {
-            throw new IllegalStateException("Nie można usunąć ostatniego administratora.");
-        }
-    }
-
-    private boolean isLastAdmin() {
-        return userRepository.findAll().stream()
-                .filter(u -> u.getRoles().contains(Role.ADMIN))
-                .count() <= 1;
+        String salt = SecurityUtils.generateSalt();
+        String hashedPassword = SecurityUtils.hashPassword(password, salt);
+        Operator newOperator = new Operator(username, hashedPassword, salt, Set.of(Role.OPERATOR));
+        userRepository.save(newOperator);
     }
 
     public void removeUser(String targetUsername, User currentUser) {
         User targetUser = userRepository.findByUsername(targetUsername)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym loginie."));
-
-        validateRemovalPermissions(targetUser, currentUser);
-
-        preventLastAdminRemoval(targetUser);
+        if (targetUser.getRoles().contains(Role.ADMIN))
+            throw new IllegalStateException("Nie można usunąć administratora.");
+        if (!authService.isAuthorized(currentUser, Operation.REMOVE_USER))
+            throw new SecurityException("Brak uprawnień do usunięcia użytkownika.");
 
         userRepository.delete(targetUser.getId());
-    }
-
-    public void createAndAddUser(String username, String password, Role roleToCreate, User currentUser) {
-        Operation op = mapRoleToOperation(roleToCreate);
-        if (!authService.isAuthorized(currentUser, op)) {
-            throw new IllegalStateException("Brak uprawnień! Twoja ranga nie pozwala na tworzenie roli: " + roleToCreate);
-        }
-        if(userRepository.findByUsername(username).isPresent())
-            throw new IllegalStateException("Użytkownik o podanym loginie już istnieje.");
-
-        User newUser;
-        String salt = SecurityUtils.generateSalt();
-        String hashedPassword = SecurityUtils.hashPassword(password, salt);
-
-        switch (roleToCreate) {
-            case ADMIN:    newUser = new Admin(username, hashedPassword, salt, Set.of(Role.ADMIN)); break;
-            case MANAGER:  newUser = new Manager(username, hashedPassword, salt, Set.of(Role.MANAGER)); break;
-            case EMPLOYEE: newUser = new Employee(username, hashedPassword, salt, Set.of(Role.EMPLOYEE)); break;
-            default: throw new IllegalArgumentException("Nieznana rola!");
-        }
-
-        userRepository.save(newUser);
-    }
-
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    private Operation mapRoleToOperation(Role role) {
-        switch (role) {
-            case ADMIN: return Operation.ADD_ADMIN;
-            case MANAGER: return Operation.ADD_MANAGER;
-            case EMPLOYEE: return Operation.ADD_EMPLOYEE;
-            default: throw new IllegalStateException("Nieobsługiwana rola");
-        }
-    }
-
-    private Operation mapRoleToRemoveOperation(Role role) {
-        switch (role) {
-            case ADMIN: return Operation.REMOVE_ADMIN;
-            case MANAGER: return Operation.REMOVE_MANAGER;
-            case EMPLOYEE: return Operation.REMOVE_EMPLOYEE;
-            default: throw new IllegalStateException("Nieobsługiwana rola");
-        }
-    }
-
-    private void validateModificationPermissions(User targetUser, User currentUser) {
-        for (Role role : targetUser.getRoles()) {
-            Operation requiredOp = getRoleModifyOperation(role);
-            if (!authService.isAuthorized(currentUser, requiredOp)) {
-                throw new SecurityException("Brak uprawnień do modyfikacji użytkownika o roli: " + role);
-            }
-        }
     }
 
     public User changePassword(String targetUsername, String newRawPassword, User currentUser) {
         User targetUser = userRepository.findByUsername(targetUsername)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym loginie."));
 
-        if (!targetUser.getId().equals(currentUser.getId())) {
-            validateModificationPermissions(targetUser, currentUser);
+        boolean isSelf = targetUser.getId().equals(currentUser.getId());
+        if (!isSelf) {
+            if (targetUser.getRoles().contains(Role.ADMIN))
+                throw new IllegalStateException("Nie można zmienić hasła administratora.");
+            if (!authService.isAuthorized(currentUser, Operation.MODIFY_USER))
+                throw new SecurityException("Brak uprawnień do modyfikacji użytkownika.");
         }
 
         String newHashedPassword = SecurityUtils.hashPassword(newRawPassword, targetUser.getSalt());
@@ -124,26 +70,23 @@ public class UserService {
     }
 
     public User changeUsername(String oldUsername, String newUsername, User currentUser) {
-        if(oldUsername.equals(newUsername))
+        if (oldUsername.equalsIgnoreCase(newUsername))
             return currentUser;
         User targetUser = userRepository.findByUsername(oldUsername)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym loginie."));
-        if(userRepository.findByUsername(newUsername).isPresent())
+        if (targetUser.getRoles().contains(Role.ADMIN))
+            throw new IllegalStateException("Nie można zmienić loginu administratora.");
+        if (userRepository.findByUsername(newUsername).isPresent())
             throw new IllegalStateException("Użytkownik o podanym loginie już istnieje.");
-
-        validateModificationPermissions(targetUser, currentUser);
+        if (!authService.isAuthorized(currentUser, Operation.MODIFY_USER))
+            throw new SecurityException("Brak uprawnień do modyfikacji użytkownika.");
 
         User updatedUser = targetUser.withUsername(newUsername);
         userRepository.save(updatedUser);
         return updatedUser;
     }
 
-    private Operation getRoleModifyOperation(Role role) {
-        switch (role) {
-            case ADMIN: return Operation.MODIFY_ADMIN;
-            case MANAGER: return Operation.MODIFY_MANAGER;
-            case EMPLOYEE: return Operation.MODIFY_EMPLOYEE;
-            default: throw new IllegalStateException("Nieobsługiwana rola");
-        }
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }

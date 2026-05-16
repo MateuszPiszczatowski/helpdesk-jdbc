@@ -4,7 +4,6 @@ import local.pk154938.shop.application.auth.AuthorizationService;
 import local.pk154938.shop.application.auth.Operation;
 import local.pk154938.shop.application.service.UserService;
 import local.pk154938.shop.application.session.Session;
-import local.pk154938.shop.domain.user.Role;
 import local.pk154938.shop.util.SecurityUtils;
 
 
@@ -13,33 +12,32 @@ public class UserManagementMenu extends BaseMenu {
     private final Session session;
 
     public UserManagementMenu(UserService userService, Session session, AuthorizationService authorizationService) {
-        super("ZARZĄDZANIE UŻYTKOWNIKAMI", session, authorizationService);
+        super("ZARZĄDZANIE OPERATORAMI", session, authorizationService);
         this.userService = userService;
         this.session = session;
     }
 
     @Override
     protected void addOptions() {
-        addOption("Lista użytkowników", this::list, Operation.VIEW_USER_LIST);
-        addOption("Dodaj użytkownika", this::add, Operation.ADD_EMPLOYEE);
-        addOption("Usuń użytkownika", this::remove, Operation.REMOVE_EMPLOYEE);
-        addOption("Modyfikuj użytkownika", this::changeOtherUser, Operation.MODIFY_EMPLOYEE, Operation.MODIFY_MANAGER, Operation.MODIFY_ADMIN);
+        addOption("Lista operatorów", this::list, Operation.VIEW_USER_LIST);
+        addOption("Dodaj operatora", this::add, Operation.ADD_USER);
+        addOption("Usuń operatora", this::remove, Operation.REMOVE_USER);
+        addOption("Modyfikuj operatora", this::changeOtherUser, Operation.MODIFY_USER);
     }
 
     private static final String SELF_OPERATION_BLOCKED =
-            "Nie możesz modyfikować własnego konta z poziomu zarządzania użytkownikami. Użyj menu Zarządzanie kontem.";
+            "Administrator nie może modyfikować własnego konta.";
 
     private void list() {
         System.out.println("\n--- LISTA UŻYTKOWNIKÓW ---");
         userService.getAllUsers().forEach(u ->
-                System.out.println("- " + u.getUsername() + " (Klasa: " + u.getClass().getSimpleName() + ")"));
+                System.out.println("- " + u.getUsername() + " (" + u.getClass().getSimpleName() + ")"));
     }
 
     private void add() {
         System.out.print("Podaj login: ");
         String login = System.console().readLine();
-        if(login.isBlank())
-        {
+        if (login.isBlank()) {
             System.out.println("Dodawanie anulowane.");
             return;
         }
@@ -51,22 +49,20 @@ public class UserManagementMenu extends BaseMenu {
             return;
         }
 
-        Role role = chooseRole();
-        if (role == null) return;
-
         try {
-            userService.createAndAddUser(login, pass, role, session.getCurrentUser());
-            System.out.println("Dodano pomyślnie.");
+            userService.createAndAddUser(login, pass, session.getCurrentUser());
+            System.out.println("Dodano operatora.");
+        } catch (SecurityException e) {
+            System.out.println("ODMOWA DOSTĘPU: " + e.getMessage());
         } catch (IllegalStateException e) {
             System.out.println("BŁĄD: " + e.getMessage());
         }
     }
 
     private void remove() {
-        System.out.print("Podaj login użytkownika do usunięcia: ");
+        System.out.print("Podaj login operatora do usunięcia: ");
         String login = System.console().readLine();
-        if(login.isBlank())
-        {
+        if (login.isBlank()) {
             System.out.println("Usuwanie anulowane.");
             return;
         }
@@ -85,24 +81,8 @@ public class UserManagementMenu extends BaseMenu {
         }
     }
 
-    private Role chooseRole() {
-        System.out.println("Wybierz rolę: 1. ADMIN | 2. MANAGER | 3. EMPLOYEE");
-        String r = System.console().readLine();
-        switch (r) {
-            case "1":
-                return Role.ADMIN;
-            case "2":
-                return Role.MANAGER;
-            case "3":
-                return Role.EMPLOYEE;
-            default:
-                System.out.println("Niepoprawna rola.");
-                return null;
-        }
-    }
-
     private void changeOtherUser() {
-        System.out.print("Podaj login użytkownika do modyfikacji: ");
+        System.out.print("Podaj login operatora do modyfikacji: ");
         String login = System.console().readLine();
         if (login.isBlank()) {
             System.out.println("Anulowano.");
@@ -143,5 +123,4 @@ public class UserManagementMenu extends BaseMenu {
             System.out.println("BŁĄD: " + e.getMessage());
         }
     }
-
 }

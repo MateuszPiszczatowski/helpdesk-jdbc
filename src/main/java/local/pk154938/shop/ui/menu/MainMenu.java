@@ -4,7 +4,9 @@ import local.pk154938.shop.application.auth.AuthorizationService;
 import local.pk154938.shop.application.auth.Operation;
 import local.pk154938.shop.application.service.UserService;
 import local.pk154938.shop.application.session.Session;
+import local.pk154938.shop.domain.user.Role;
 import local.pk154938.shop.domain.user.User;
+import local.pk154938.shop.util.SecurityUtils;
 
 import java.util.Optional;
 
@@ -32,7 +34,7 @@ public class MainMenu extends BaseMenu {
         }
     }
 
-    private void logout(){
+    private void logout() {
         session.logout();
         System.out.println("Wylogowano.");
     }
@@ -41,19 +43,32 @@ public class MainMenu extends BaseMenu {
         new UserManagementMenu(userService, session, authorizationService).show();
     }
 
-    private void enterAccountManagement() {
-        new AccountManagementMenu(userService, session, authorizationService).show();
+    private void changeOwnPassword() {
+        System.out.print("Podaj nowe hasło: ");
+        String pass = new String(System.console().readPassword());
+        if (!SecurityUtils.isPasswordStrong(pass)) {
+            System.out.println("BŁĄD: Hasło musi składać się z minimum 8 znaków i zawierać małą literę, wielką literę, cyfrę oraz znak specjalny.");
+            return;
+        }
+        try {
+            User updated = userService.changePassword(session.getCurrentUser().getUsername(), pass, session.getCurrentUser());
+            session.login(updated);
+            System.out.println("Twoje hasło zostało pomyślnie zmienione.");
+        } catch (Exception e) {
+            System.out.println("BŁĄD: " + e.getMessage());
+        }
     }
-
 
     @Override
     protected void addOptions() {
         if (session.isLoggedIn()) {
-            addOption("Zarządzanie użytkownikami", this::enterUserManagement,
-                    Operation.VIEW_USER_LIST, Operation.ADD_EMPLOYEE, Operation.REMOVE_EMPLOYEE,
-                    Operation.ADD_MANAGER, Operation.REMOVE_MANAGER,
-                    Operation.ADD_ADMIN, Operation.REMOVE_ADMIN);
-            addOption("Zarządzanie kontem", this::enterAccountManagement, Operation.AUTHENTICATED);
+            boolean isAdmin = session.getCurrentUser().getRoles().contains(Role.ADMIN);
+            if (isAdmin) {
+                addOption("Zarządzanie operatorami", this::enterUserManagement,
+                        Operation.VIEW_USER_LIST, Operation.ADD_USER, Operation.REMOVE_USER, Operation.MODIFY_USER);
+            } else {
+                addOption("Zmień hasło", this::changeOwnPassword, Operation.AUTHENTICATED);
+            }
             addOption("Wyloguj", this::logout, Operation.AUTHENTICATED);
         } else {
             addOption("Zaloguj", this::handleLogin, Operation.ANONYMOUS);
