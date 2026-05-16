@@ -6,5 +6,7 @@ public enum Operation {
     ADD_USER,
     MODIFY_USER,
     REMOVE_USER,
-    VIEW_USER_LIST
+    VIEW_USER_LIST,
+    HANDLE_TICKETS,
+    DELETE_TICKET
 }

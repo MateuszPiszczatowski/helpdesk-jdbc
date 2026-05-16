@@ -4,7 +4,7 @@ import java.util.Set;
 
 public enum Role {
     ADMIN(Set.of(Permission.values())),
-    OPERATOR(Set.of());
+    OPERATOR(Set.of(Permission.HANDLE_TICKETS));
 
     private final Set<Permission> permissions;
 

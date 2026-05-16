@@ -11,7 +11,9 @@ public class AuthorizationService {
             Map.entry(Operation.ADD_USER, Set.of(Permission.MANAGE_OPERATORS)),
             Map.entry(Operation.MODIFY_USER, Set.of(Permission.MANAGE_OPERATORS)),
             Map.entry(Operation.REMOVE_USER, Set.of(Permission.MANAGE_OPERATORS)),
-            Map.entry(Operation.VIEW_USER_LIST, Set.of(Permission.VIEW_USERS))
+            Map.entry(Operation.VIEW_USER_LIST, Set.of(Permission.VIEW_USERS)),
+            Map.entry(Operation.HANDLE_TICKETS, Set.of(Permission.HANDLE_TICKETS)),
+            Map.entry(Operation.DELETE_TICKET, Set.of(Permission.DELETE_TICKETS))
     );
 
     public boolean isAuthorized(User user, Operation op) {
