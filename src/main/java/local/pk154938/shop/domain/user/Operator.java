@@ -8,7 +8,7 @@ public class Operator extends User {
         super(username, hashedPassword, salt, roles);
     }
 
-    public Operator(UUID id, String username, String hashedPassword, String salt, Set<Role> roles) {
+    Operator(UUID id, String username, String hashedPassword, String salt, Set<Role> roles) {
         super(id, username, hashedPassword, salt, roles);
     }
 

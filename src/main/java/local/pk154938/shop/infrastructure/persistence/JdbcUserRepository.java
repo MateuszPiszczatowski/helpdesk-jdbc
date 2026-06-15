@@ -1,10 +1,9 @@
 package local.pk154938.shop.infrastructure.persistence;
 
 import local.pk154938.shop.application.repository.UserRepository;
-import local.pk154938.shop.domain.user.Admin;
-import local.pk154938.shop.domain.user.Operator;
 import local.pk154938.shop.domain.user.Role;
 import local.pk154938.shop.domain.user.User;
+import local.pk154938.shop.domain.user.UserFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +12,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -96,11 +94,6 @@ public class JdbcUserRepository implements UserRepository {
         String hashedPassword = rs.getString("hashed_password");
         String salt = rs.getString("salt");
         Role role = Role.valueOf(rs.getString("role"));
-        Set<Role> roles = Set.of(role);
-        switch (role) {
-            case ADMIN:    return new Admin(id, username, hashedPassword, salt, roles);
-            case OPERATOR: return new Operator(id, username, hashedPassword, salt, roles);
-            default: throw new SQLException("Nieznana rola użytkownika: " + role);
-        }
+        return UserFactory.reconstitute(id, username, hashedPassword, salt, role);
     }
 }
