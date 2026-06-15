@@ -34,9 +34,8 @@ public class MainMenu extends BaseMenu {
                 addOption("Zarządzanie operatorami", this::enterUserManagement,
                         Operation.VIEW_USER_LIST, Operation.ADD_USER,
                         Operation.REMOVE_USER, Operation.MODIFY_USER);
-            } else {
-                addOption("Zmień hasło", this::changeOwnPassword, Operation.AUTHENTICATED);
             }
+            addOption("Zmień hasło", this::changeOwnPassword, Operation.AUTHENTICATED);
             addOption("Obsługa zgłoszeń", this::enterTicketManagement,
                     Operation.HANDLE_TICKETS, Operation.DELETE_TICKET);
             addOption("Wyloguj", this::logout, Operation.AUTHENTICATED);
