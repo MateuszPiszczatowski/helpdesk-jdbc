@@ -53,7 +53,7 @@ public class TicketService {
 
     public Optional<Ticket> checkTicket(int id, String firstName, String lastName) {
         Optional<Ticket> opt = ticketRepository.findForClient(id, firstName, lastName);
-        opt.ifPresent(this::refreshStatus);
+        opt.ifPresent(TicketService::applyComputedStatus);
         return opt;
     }
 
@@ -61,7 +61,7 @@ public class TicketService {
         requireNonBlank(newMessage, "Treść zgłoszenia");
         Ticket t = ticketRepository.findForClient(id, firstName, lastName)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono zgłoszenia o podanych danych."));
-        refreshStatus(t);
+        applyComputedStatus(t);
         if (t.getStatus() == TicketStatus.COMPLETED)
             throw new IllegalStateException("Zgłoszenie jest zamknięte — nie można edytować.");
 
@@ -76,7 +76,7 @@ public class TicketService {
     public List<Ticket> listTickets(User currentUser) {
         requireAuthorized(currentUser, Operation.HANDLE_TICKETS);
         List<Ticket> all = ticketRepository.findAll();
-        all.forEach(this::refreshStatus);
+        all.forEach(TicketService::applyComputedStatus);
         return all;
     }
 
@@ -84,7 +84,7 @@ public class TicketService {
         requireAuthorized(currentUser, Operation.HANDLE_TICKETS);
         Ticket t = ticketRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono zgłoszenia o ID: " + id));
-        refreshStatus(t);
+        applyComputedStatus(t);
         return t;
     }
 
@@ -98,7 +98,7 @@ public class TicketService {
         requireNonBlank(message, "Wiadomość pracownika");
         Ticket t = ticketRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono zgłoszenia o ID: " + id));
-        refreshStatus(t);
+        applyComputedStatus(t);
         if (t.getStatus() == TicketStatus.COMPLETED)
             throw new IllegalStateException("Zgłoszenie jest zamknięte — nie można modyfikować.");
 
@@ -154,16 +154,15 @@ public class TicketService {
     }
 
     /**
-     * Recomputes status based on the other fields and persists the change
-     * if it differs from the current stored value.
+     * Recomputes the status and applies it to the in-memory object for display.
+     * Does <em>not</em> persist: the DELAYED ↔ IN_PROGRESS flip is a pure
+     * function of {@code predictedCompletionAt} vs. now, and no query filters on
+     * the stored {@code status} column, so it is recomputed on every read rather
+     * than written back. Genuine status changes (worker reply, close) are
+     * persisted by the methods that cause them.
      */
-    private void refreshStatus(Ticket t) {
-        TicketStatus old = t.getStatus();
-        TicketStatus fresh = computeStatus(t);
-        if (fresh != old) {
-            t.setStatus(fresh);
-            ticketRepository.update(t);
-        }
+    private static void applyComputedStatus(Ticket t) {
+        t.setStatus(computeStatus(t));
     }
 
     private static TicketStatus computeStatus(Ticket t) {
