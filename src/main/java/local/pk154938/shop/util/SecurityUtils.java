@@ -9,9 +9,24 @@ import java.util.Base64;
 
 public class SecurityUtils {
 
-    private static final String PEPPER = System.getenv("SHOP_APP_PEPPER") != null
-            ? System.getenv("SHOP_APP_PEPPER")
-            : "FALLBACK_INSECURE_PEPPER_CHANGE_ME";
+    private static final String FALLBACK_PEPPER = "FALLBACK_INSECURE_PEPPER_CHANGE_ME";
+    private static final boolean USING_FALLBACK_PEPPER;
+    private static final String PEPPER;
+    static {
+        String env = System.getenv("SHOP_APP_PEPPER");
+        USING_FALLBACK_PEPPER = (env == null || env.isEmpty());
+        PEPPER = USING_FALLBACK_PEPPER ? FALLBACK_PEPPER : env;
+    }
+
+    /**
+     * True when {@code SHOP_APP_PEPPER} was not set and the insecure built-in
+     * pepper is in use. Callers should warn loudly: hashes are computed with a
+     * publicly known pepper, and accounts created this way will stop validating
+     * once a real pepper is configured.
+     */
+    public static boolean isUsingFallbackPepper() {
+        return USING_FALLBACK_PEPPER;
+    }
 
     private static final String ALGORITHM = "PBKDF2WithHmacSHA256";
     private static final int ITERATIONS = 120_000;

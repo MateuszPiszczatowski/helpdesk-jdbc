@@ -10,6 +10,7 @@ import local.pk154938.shop.infrastructure.persistence.DbConnection;
 import local.pk154938.shop.infrastructure.persistence.JdbcUserRepository;
 import local.pk154938.shop.infrastructure.persistence.JdbcTicketRepository;
 import local.pk154938.shop.ui.menu.MainMenu;
+import local.pk154938.shop.util.SecurityUtils;
 
 import java.sql.SQLException;
 
@@ -27,8 +28,30 @@ public class Main {
         System.exit(exitCode.getCode());
     }
 
+    /**
+     * Warns when the app is hashing with the insecure built-in pepper because
+     * {@code SHOP_APP_PEPPER} was not set. Not fatal — the app still runs — but
+     * the operator must know the security implications.
+     */
+    private static void warnIfInsecurePepper() {
+        if (!SecurityUtils.isUsingFallbackPepper()) {
+            return;
+        }
+        System.err.println();
+        System.err.println("########################################################");
+        System.err.println("# UWAGA: zmienna SHOP_APP_PEPPER nie jest ustawiona.   #");
+        System.err.println("# Hasła są hashowane wbudowanym, NIEBEZPIECZNYM         #");
+        System.err.println("# pieprzem. Ustaw SHOP_APP_PEPPER przed użyciem         #");
+        System.err.println("# produkcyjnym. Konta utworzone teraz przestaną się    #");
+        System.err.println("# logować po późniejszym ustawieniu prawdziwego pieprzu.#");
+        System.err.println("########################################################");
+        System.err.println();
+    }
+
     public static void main(String[] args) {
         Session session = new Session();
+
+        warnIfInsecurePepper();
 
         DbConnection db = null;
         try {
