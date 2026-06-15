@@ -8,7 +8,7 @@ import java.sql.Statement;
 /**
  * Owns the single JDBC connection used by the app. Reads connection
  * parameters from environment variables (with sensible local-MySQL
- * defaults) and lazily ensures the {@code tickets} table exists.
+ * defaults) and lazily ensures the {@code tickets} and {@code users} tables exist.
  *
  * <p>Env vars (all optional):
  * <ul>
@@ -37,6 +37,15 @@ public class DbConnection {
             "  closed_at                   DATETIME     NULL" +
             ") CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
 
+    private static final String USERS_SQL =
+            "CREATE TABLE IF NOT EXISTS users (" +
+            "  id              CHAR(36)     PRIMARY KEY," +
+            "  username        VARCHAR(100) NOT NULL UNIQUE," +
+            "  hashed_password VARCHAR(255) NOT NULL," +
+            "  salt            VARCHAR(255) NOT NULL," +
+            "  role            VARCHAR(20)  NOT NULL" +
+            ") CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+
     private final Connection connection;
 
     public DbConnection() throws SQLException {
@@ -58,6 +67,7 @@ public class DbConnection {
     public void initSchema() throws SQLException {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(SCHEMA_SQL);
+            stmt.execute(USERS_SQL);
         }
     }
 

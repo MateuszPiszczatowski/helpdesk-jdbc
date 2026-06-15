@@ -16,3 +16,13 @@ CREATE TABLE IF NOT EXISTS tickets (
     status                      VARCHAR(20)  NOT NULL,
     closed_at                   DATETIME     NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Konta pracowników (operatorzy + administrator). Tworzona przy starcie przez
+-- DbConnection.initSchema(). Identyfikator to UUID generowany po stronie aplikacji.
+CREATE TABLE IF NOT EXISTS users (
+    id              CHAR(36)     PRIMARY KEY,
+    username        VARCHAR(100) NOT NULL UNIQUE,
+    hashed_password VARCHAR(255) NOT NULL,
+    salt            VARCHAR(255) NOT NULL,
+    role            VARCHAR(20)  NOT NULL
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
