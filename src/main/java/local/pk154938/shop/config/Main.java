@@ -7,7 +7,7 @@ import local.pk154938.shop.application.service.TicketService;
 import local.pk154938.shop.application.service.UserService;
 import local.pk154938.shop.application.session.Session;
 import local.pk154938.shop.infrastructure.persistence.DbConnection;
-import local.pk154938.shop.infrastructure.persistence.InMemoryUserRepository;
+import local.pk154938.shop.infrastructure.persistence.JdbcUserRepository;
 import local.pk154938.shop.infrastructure.persistence.JdbcTicketRepository;
 import local.pk154938.shop.ui.menu.MainMenu;
 
@@ -29,16 +29,6 @@ public class Main {
 
     public static void main(String[] args) {
         Session session = new Session();
-        UserRepository userRepository = new InMemoryUserRepository();
-
-        DataSeeder dataSeeder = new DataSeeder(userRepository);
-        try {
-            dataSeeder.seedAdminIfMissing();
-        } catch (IllegalStateException e) {
-            System.out.println(e.getMessage());
-            terminate(ExitCode.INVALID_CONFIG);
-            return;
-        }
 
         DbConnection db = null;
         try {
@@ -51,6 +41,17 @@ public class Main {
         }
 
         try {
+            UserRepository userRepository = new JdbcUserRepository(db.getConnection());
+
+            DataSeeder dataSeeder = new DataSeeder(userRepository);
+            try {
+                dataSeeder.seedAdminIfMissing();
+            } catch (IllegalStateException e) {
+                System.out.println(e.getMessage());
+                terminate(ExitCode.INVALID_CONFIG);
+                return;
+            }
+
             AuthorizationService authService = new AuthorizationService();
             UserService userService = new UserService(userRepository, authService);
             TicketRepository ticketRepository = new JdbcTicketRepository(db.getConnection());
