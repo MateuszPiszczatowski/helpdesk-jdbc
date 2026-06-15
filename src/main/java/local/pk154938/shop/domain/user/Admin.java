@@ -7,7 +7,7 @@ public class Admin extends User{
     public Admin(String username, String hashedPassword, String salt, Set<Role> roles){
         super(username, hashedPassword, salt, roles);
     }
-    private Admin(UUID id, String username, String hashedPassword, String salt, Set<Role> roles){
+    public Admin(UUID id, String username, String hashedPassword, String salt, Set<Role> roles){
         super(id, username, hashedPassword, salt, roles);
     }
 
