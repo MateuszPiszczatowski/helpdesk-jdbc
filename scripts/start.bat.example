@@ -6,6 +6,12 @@ set SHOP_APP_PEPPER=ZmienTenPieprzNaWlasnySekret123!
 set SHOP_DEFAULT_ADMIN_USER=admin
 set SHOP_DEFAULT_ADMIN_PASS=Admin1234!
 
+:: Tryb developerski (opcjonalny, domyślnie wyłączony). Gdy =true, ConsoleIo
+:: używa fallbacku na stdin do uruchamiania pod debuggerem IDE (hasło NIE jest
+:: maskowane). Bez tej flagi brak prawdziwej konsoli kończy się czytelnym
+:: komunikatem zamiast fallbacku. Odkomentuj tylko na potrzeby developmentu.
+:: set SHOP_APP_DEV_MODE=true
+
 :: Parametry połączenia z bazą MySQL (każdy ma sensowny default w kodzie)
 :: APP_DB_HOST=localhost
 :: APP_DB_PORT=3306
