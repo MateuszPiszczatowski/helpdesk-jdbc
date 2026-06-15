@@ -9,6 +9,7 @@ import local.pk154938.shop.application.session.Session;
 import local.pk154938.shop.infrastructure.persistence.DbConnection;
 import local.pk154938.shop.infrastructure.persistence.JdbcUserRepository;
 import local.pk154938.shop.infrastructure.persistence.JdbcTicketRepository;
+import local.pk154938.shop.ui.menu.ConsoleIo;
 import local.pk154938.shop.ui.menu.MainMenu;
 import local.pk154938.shop.util.SecurityUtils;
 
@@ -52,6 +53,15 @@ public class Main {
         Session session = new Session();
 
         warnIfInsecurePepper();
+
+        if (ConsoleIo.isInteractiveInputUnavailable()) {
+            System.err.println("Aplikacja nie jest uruchomiona w prawidłowej konsoli "
+                    + "(brak System.console()).");
+            System.err.println("Uruchom ją z terminala, albo ustaw SHOP_APP_DEV_MODE=true, "
+                    + "aby włączyć tryb developerski z odczytem ze standardowego wejścia.");
+            terminate(ExitCode.INVALID_CONFIG);
+            return;
+        }
 
         DbConnection db = null;
         try {
