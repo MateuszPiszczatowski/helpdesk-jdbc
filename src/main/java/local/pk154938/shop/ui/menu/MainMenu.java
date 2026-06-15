@@ -52,9 +52,9 @@ public class MainMenu extends BaseMenu {
 
     private void handleLogin() {
         System.out.print("Login: ");
-        String login = System.console().readLine();
+        String login = ConsoleIo.readLine();
         System.out.print("Hasło: ");
-        String password = new String(System.console().readPassword());
+        String password = new String(ConsoleIo.readPassword());
 
         Optional<User> user = userService.login(login, password);
         if (user.isPresent()) {
@@ -79,7 +79,7 @@ public class MainMenu extends BaseMenu {
 
     private void changeOwnPassword() {
         System.out.print("Podaj nowe hasło: ");
-        String pass = new String(System.console().readPassword());
+        String pass = new String(ConsoleIo.readPassword());
         if (!SecurityUtils.isPasswordStrong(pass)) {
             System.out.println("BŁĄD: Hasło musi składać się z minimum 8 znaków i zawierać małą literę, wielką literę, cyfrę oraz znak specjalny.");
             return;

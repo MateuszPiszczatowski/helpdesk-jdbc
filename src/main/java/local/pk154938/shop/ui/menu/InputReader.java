@@ -14,7 +14,7 @@ public final class InputReader {
     }
 
     public static String readNonBlankString(String prompt) {
-        String s = System.console().readLine(prompt);
+        String s = ConsoleIo.readLine(prompt);
         if (s == null || s.isBlank()) throw new CancelledException();
         return s.trim();
     }
@@ -37,7 +37,7 @@ public final class InputReader {
      * instead of cancelling — useful when the field is optional.
      */
     public static Integer readOptionalPositiveInt(String prompt) {
-        String s = System.console().readLine(prompt);
+        String s = ConsoleIo.readLine(prompt);
         if (s == null || s.isBlank()) return null;
         int v;
         try {
