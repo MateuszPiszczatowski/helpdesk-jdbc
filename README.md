@@ -62,6 +62,8 @@ IntelliJ project (no Maven/Gradle). The connector is in `lib/`; the artifact man
 3. Copy `scripts/start.bat.example` to `scripts/start.bat`, set your own `SHOP_APP_PEPPER` (and optionally `SHOP_DEFAULT_ADMIN_*` and the `APP_DB_*` connection parameters - each has a sensible default: `localhost:3306`, database `tickets`, user `root`, empty password), then run it - or run `java -Dfile.encoding=UTF-8 -jar <artifact>.jar` directly.
 4. Optionally load `seed.sql` for sample data.
 
+**TODO:** migrate the manual `javac` / `lib/*.jar` build to a build tool (**Maven** or **Gradle**) for declarative dependency management and reproducible, one-command builds - this would also remove the vendored JDBC connector jar from the repo.
+
 > Under an IDE debugger set `SHOP_APP_DEV_MODE=true` (stdin fallback; the password is **not** masked). Always set a real `SHOP_APP_PEPPER` in production.
 
 ### Accepted simplifications
@@ -127,6 +129,8 @@ Projekt IntelliJ (bez Mavena/Gradle). Konektor jest w `lib/`; manifest artefaktu
 2. Zbuduj artefakt fat jar (IntelliJ: *Build → Build Artifacts*) albo skompiluj `src/main/java` z `lib/mysql-connector-j-9.3.0.jar` i spakuj jar zawierający tę zależność.
 3. Skopiuj `scripts/start.bat.example` jako `scripts/start.bat`, ustaw własny `SHOP_APP_PEPPER` (i opcjonalnie `SHOP_DEFAULT_ADMIN_*` oraz parametry połączenia `APP_DB_*` - każdy ma sensowny default: `localhost:3306`, baza `tickets`, użytkownik `root`, puste hasło), a następnie go uruchom - albo wywołaj `java -Dfile.encoding=UTF-8 -jar <artefakt>.jar` bezpośrednio.
 4. Opcjonalnie wgraj `seed.sql` dla danych przykładowych.
+
+**TODO:** migracja ręcznego budowania (`javac` / `lib/*.jar`) na narzędzie budujące (**Maven** lub **Gradle**) - deklaratywne zarządzanie zależnościami i powtarzalny build jednym poleceniem; pozwoliłoby to też usunąć dołączony jar konektora JDBC z repo.
 
 > Pod debuggerem IDE ustaw `SHOP_APP_DEV_MODE=true` (fallback na stdin; hasło **nie** jest maskowane). Produkcyjnie zawsze ustaw własny `SHOP_APP_PEPPER`.
 
